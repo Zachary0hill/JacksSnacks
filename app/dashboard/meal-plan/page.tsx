@@ -11,7 +11,11 @@ import {
   Flame,
   X,
   Check,
-  ArrowLeftRight
+  ArrowLeftRight,
+  Zap,
+  TrendingUp,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react'
 
 export default function MealPlanPage() {
@@ -22,55 +26,61 @@ export default function MealPlanPage() {
 
   // Mock meal data - would come from Supabase
   const mockMeals = [
-    { id: '1', name: 'Chicken Teriyaki Bowl', calories: 520, protein: 35, carbs: 45, fat: 18, cookTime: 25, difficulty: 'Easy' },
-    { id: '2', name: 'Salmon Quinoa Salad', calories: 480, protein: 32, carbs: 38, fat: 22, cookTime: 20, difficulty: 'Easy' },
-    { id: '3', name: 'Beef Stir Fry', calories: 450, protein: 28, carbs: 35, fat: 20, cookTime: 15, difficulty: 'Medium' },
-    { id: '4', name: 'Greek Chicken Bowl', calories: 490, protein: 38, carbs: 42, fat: 16, cookTime: 30, difficulty: 'Easy' },
-    { id: '5', name: 'Turkey Meatballs', calories: 410, protein: 30, carbs: 25, fat: 18, cookTime: 35, difficulty: 'Medium' },
-    { id: '6', name: 'Veggie Buddha Bowl', calories: 380, protein: 15, carbs: 52, fat: 14, cookTime: 20, difficulty: 'Easy' }
+    { id: '1', name: 'Honey Garlic Salmon', calories: 520, protein: 35, carbs: 45, fat: 18, cookTime: 25, difficulty: 'Easy', image: '🐟' },
+    { id: '2', name: 'Mediterranean Chicken', calories: 480, protein: 32, carbs: 38, fat: 22, cookTime: 20, difficulty: 'Easy', image: '🍗' },
+    { id: '3', name: 'Thai Beef Bowl', calories: 450, protein: 28, carbs: 35, fat: 20, cookTime: 15, difficulty: 'Medium', image: '🥩' },
+    { id: '4', name: 'Veggie Power Bowl', calories: 420, protein: 15, carbs: 52, fat: 14, cookTime: 20, difficulty: 'Easy', image: '🥗' },
+    { id: '5', name: 'BBQ Pulled Pork', calories: 580, protein: 30, carbs: 25, fat: 18, cookTime: 35, difficulty: 'Medium', image: '🍖' },
+    { id: '6', name: 'Quinoa Buddha Bowl', calories: 380, protein: 18, carbs: 48, fat: 16, cookTime: 15, difficulty: 'Easy', image: '🍲' },
+    { id: '7', name: 'Grilled Chicken Caesar', calories: 460, protein: 38, carbs: 28, fat: 22, cookTime: 20, difficulty: 'Easy', image: '🥙' },
+    { id: '8', name: 'Teriyaki Tofu Stir-fry', calories: 390, protein: 20, carbs: 42, fat: 18, cookTime: 18, difficulty: 'Easy', image: '🥢' }
   ]
 
   // Mock weekly plan - would come from meal_plans table
   const [weeklyPlan, setWeeklyPlan] = useState({
-    'Monday': [
+    'Mon': [
       { slot: 'breakfast', meal: mockMeals[0] },
       { slot: 'lunch', meal: mockMeals[1] },
       { slot: 'dinner', meal: mockMeals[2] }
     ],
-    'Tuesday': [
+    'Tue': [
       { slot: 'breakfast', meal: mockMeals[3] },
       { slot: 'lunch', meal: mockMeals[4] },
       { slot: 'dinner', meal: mockMeals[5] }
     ],
-    'Wednesday': [
+    'Wed': [
       { slot: 'breakfast', meal: null },
       { slot: 'lunch', meal: mockMeals[0] },
       { slot: 'dinner', meal: mockMeals[1] }
     ],
-    'Thursday': [
+    'Thu': [
       { slot: 'breakfast', meal: mockMeals[2] },
       { slot: 'lunch', meal: null },
       { slot: 'dinner', meal: mockMeals[3] }
     ],
-    'Friday': [
+    'Fri': [
       { slot: 'breakfast', meal: mockMeals[4] },
       { slot: 'lunch', meal: mockMeals[5] },
       { slot: 'dinner', meal: null }
     ],
-    'Saturday': [
+    'Sat': [
       { slot: 'breakfast', meal: null },
       { slot: 'lunch', meal: null },
       { slot: 'dinner', meal: mockMeals[0] }
     ],
-    'Sunday': [
+    'Sun': [
       { slot: 'breakfast', meal: mockMeals[1] },
       { slot: 'lunch', meal: mockMeals[2] },
       { slot: 'dinner', meal: mockMeals[3] }
     ]
   })
 
-  const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
-  const mealSlots = ['breakfast', 'lunch', 'dinner']
+  const daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+  const mealSlots = [
+    { id: 'breakfast', name: 'Breakfast', time: '8:00 AM', icon: '🌅' },
+    { id: 'lunch', name: 'Lunch', time: '12:30 PM', icon: '☀️' },
+    { id: 'dinner', name: 'Dinner', time: '7:00 PM', icon: '🌙' }
+  ]
 
   // Calculate daily totals
   const calculateDayTotals = (dayMeals: any[]) => {
@@ -166,163 +176,234 @@ export default function MealPlanPage() {
   const targetProtein = 150
 
   return (
-    <div className="max-w-7xl mx-auto space-y-8">
+    <div className="max-w-7xl mx-auto space-y-6 p-6 bg-gray-50 min-h-screen">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">My Meal Plan</h1>
-          <p className="text-gray-600 mt-1">
-            Drag and drop meals to plan your week
+          <p className="text-gray-600 mt-1 text-lg">
+            Plan your perfect week of nutrition 🍽️
           </p>
         </div>
         
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2 text-sm text-gray-600">
-            <Calendar className="w-4 h-4" />
-            Week of Dec 18, 2023
+          <div className="flex items-center gap-2 bg-white rounded-2xl px-4 py-2 shadow-sm">
+            <ChevronLeft className="w-4 h-4 text-gray-400 cursor-pointer hover:text-gray-600" />
+            <div className="flex items-center gap-2 text-sm font-medium text-gray-700">
+              <Calendar className="w-4 h-4" />
+              Dec 18 - 24, 2023
+            </div>
+            <ChevronRight className="w-4 h-4 text-gray-400 cursor-pointer hover:text-gray-600" />
           </div>
-          <button className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2">
-            <Plus className="w-4 h-4" />
+          <button className="bg-green-500 text-white px-6 py-3 rounded-2xl hover:bg-green-600 transition-colors flex items-center gap-2 font-medium">
+            <Zap className="w-4 h-4" />
             Auto-Fill Week
           </button>
         </div>
       </div>
 
-      {/* Weekly Summary */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Week Summary</h2>
-        
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          <div className="text-center">
-            <div className="text-2xl font-bold text-gray-900">{weeklyTotals.meals}</div>
-            <div className="text-sm text-gray-600">Meals Planned</div>
+      {/* Weekly Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="bg-white rounded-2xl p-6 shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <div className="w-12 h-12 bg-green-100 rounded-2xl flex items-center justify-center">
+              <ChefHat className="w-6 h-6 text-green-600" />
+            </div>
+            <span className="text-2xl">🍽️</span>
           </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-green-600">{Math.round(weeklyTotals.calories / 7)}</div>
-            <div className="text-sm text-gray-600">Avg Calories/Day</div>
+          <div className="text-2xl font-bold text-gray-900 mb-1">{weeklyTotals.meals}</div>
+          <div className="text-sm text-gray-600 mb-2">Meals Planned</div>
+          <div className="text-xs text-green-600 font-medium">
+            {Math.round((weeklyTotals.meals / 21) * 100)}% of week
           </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-blue-600">{Math.round(weeklyTotals.protein / 7)}g</div>
-            <div className="text-sm text-gray-600">Avg Protein/Day</div>
+        </div>
+
+        <div className="bg-white rounded-2xl p-6 shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <div className="w-12 h-12 bg-orange-100 rounded-2xl flex items-center justify-center">
+              <Flame className="w-6 h-6 text-orange-500" />
+            </div>
+            <span className="text-2xl">⚡</span>
           </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-purple-600">{Math.round((weeklyTotals.calories / 7 / targetCalories) * 100)}%</div>
-            <div className="text-sm text-gray-600">Target Achievement</div>
+          <div className="text-2xl font-bold text-gray-900 mb-1">{Math.round(weeklyTotals.calories / 7)}</div>
+          <div className="text-sm text-gray-600 mb-2">Avg Calories/Day</div>
+          <div className="text-xs text-orange-500 font-medium">
+            {Math.round((weeklyTotals.calories / 7 / targetCalories) * 100)}% of target
+          </div>
+        </div>
+
+        <div className="bg-white rounded-2xl p-6 shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <div className="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center">
+              <Target className="w-6 h-6 text-blue-500" />
+            </div>
+            <span className="text-2xl">💪</span>
+          </div>
+          <div className="text-2xl font-bold text-gray-900 mb-1">{Math.round(weeklyTotals.protein / 7)}g</div>
+          <div className="text-sm text-gray-600 mb-2">Avg Protein/Day</div>
+          <div className="text-xs text-blue-500 font-medium">
+            {Math.round((weeklyTotals.protein / 7 / targetProtein) * 100)}% of target
+          </div>
+        </div>
+
+        <div className="bg-white rounded-2xl p-6 shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <div className="w-12 h-12 bg-purple-100 rounded-2xl flex items-center justify-center">
+              <TrendingUp className="w-6 h-6 text-purple-500" />
+            </div>
+            <span className="text-2xl">🎯</span>
+          </div>
+          <div className="text-2xl font-bold text-gray-900 mb-1">{Math.round((weeklyTotals.calories / 7 / targetCalories) * 100)}%</div>
+          <div className="text-sm text-gray-600 mb-2">Goal Progress</div>
+          <div className="text-xs text-purple-500 font-medium">
+            {Math.round((weeklyTotals.calories / 7 / targetCalories) * 100) >= 90 ? 'Excellent!' : 'Keep going!'}
           </div>
         </div>
       </div>
 
-      {/* Meal Plan Grid */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        <div className="grid grid-cols-8 border-b border-gray-200">
-          <div className="p-4 bg-gray-50 font-medium text-gray-900">Time</div>
-          {daysOfWeek.map(day => (
-            <div key={day} className="p-4 bg-gray-50 font-medium text-gray-900 text-center">
-              {day}
-              <div className="text-xs text-gray-500 mt-1">
-                {calculateDayTotals(weeklyPlan[day as keyof typeof weeklyPlan]).calories} cal
-              </div>
-            </div>
-          ))}
+      {/* Meal Plan Calendar */}
+      <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+        <div className="p-6 border-b border-gray-100">
+          <h2 className="text-xl font-bold text-gray-900">Your Weekly Plan</h2>
+          <p className="text-gray-600 text-sm mt-1">Drag meals from below to plan your week</p>
         </div>
 
-        {mealSlots.map(slot => (
-          <div key={slot} className="grid grid-cols-8 border-b border-gray-200 min-h-[120px]">
-            <div className="p-4 bg-gray-50 flex items-center">
-              <div>
-                <div className="font-medium text-gray-900 capitalize">{slot}</div>
-                <div className="text-xs text-gray-500">
-                  {slot === 'breakfast' ? '8:00 AM' : 
-                   slot === 'lunch' ? '12:30 PM' : '7:00 PM'}
+        <div className="overflow-x-auto">
+          <div className="min-w-full">
+            {/* Header */}
+            <div className="grid grid-cols-8 border-b border-gray-100">
+              <div className="p-4 font-medium text-gray-500 text-sm">MEAL</div>
+              {daysOfWeek.map(day => (
+                <div key={day} className="p-4 text-center">
+                  <div className="font-bold text-gray-900">{day}</div>
+                  <div className="text-xs text-gray-500 mt-1">
+                    {calculateDayTotals(weeklyPlan[day as keyof typeof weeklyPlan]).calories} cal
+                  </div>
                 </div>
-              </div>
+              ))}
             </div>
-            
-            {daysOfWeek.map(day => {
-              const dayMeal = weeklyPlan[day as keyof typeof weeklyPlan].find(m => m.slot === slot)
-              const meal = dayMeal?.meal
-              
-              return (
-                <div
-                  key={`${day}-${slot}`}
-                  className="p-3 border-r border-gray-200 last:border-r-0"
-                  onDragOver={handleDragOver}
-                  onDrop={(e) => handleDrop(e, day, slot)}
-                >
-                  {meal ? (
-                    <div className="bg-green-50 border border-green-200 rounded-lg p-3 h-full relative group">
-                      <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
-                        <button
-                          onClick={() => handleSwapMeal(day, slot, meal)}
-                          className="w-6 h-6 bg-blue-500 text-white rounded text-xs hover:bg-blue-600 flex items-center justify-center"
-                        >
-                          <ArrowLeftRight className="w-3 h-3" />
-                        </button>
-                        <button
-                          onClick={() => removeMeal(day, slot)}
-                          className="w-6 h-6 bg-red-500 text-white rounded text-xs hover:bg-red-600 flex items-center justify-center"
-                        >
-                          <X className="w-3 h-3" />
-                        </button>
-                      </div>
-                      
-                      <h4 className="font-medium text-gray-900 text-sm mb-2 pr-12">{meal.name}</h4>
-                      <div className="text-xs text-gray-600 space-y-1">
-                        <div className="flex items-center gap-1">
-                          <Flame className="w-3 h-3" />
-                          {meal.calories} cal
-                        </div>
-                        <div>P: {meal.protein}g • C: {meal.carbs}g • F: {meal.fat}g</div>
-                        <div className="flex items-center gap-1">
-                          <Clock className="w-3 h-3" />
-                          {meal.cookTime}min
-                        </div>
-                      </div>
+
+            {/* Meal Slots */}
+            {mealSlots.map(slot => (
+              <div key={slot.id} className="grid grid-cols-8 border-b border-gray-50 last:border-b-0 min-h-[100px]">
+                <div className="p-4 bg-gray-50 flex items-center">
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl">{slot.icon}</span>
+                    <div>
+                      <div className="font-medium text-gray-900">{slot.name}</div>
+                      <div className="text-xs text-gray-500">{slot.time}</div>
                     </div>
-                  ) : (
-                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-3 h-full flex items-center justify-center text-gray-400 hover:border-green-400 hover:bg-green-50 transition-colors">
-                      <Plus className="w-6 h-6" />
-                    </div>
-                  )}
+                  </div>
                 </div>
-              )
-            })}
+                
+                {daysOfWeek.map(day => {
+                  const dayMeal = weeklyPlan[day as keyof typeof weeklyPlan].find(m => m.slot === slot.id)
+                  const meal = dayMeal?.meal
+                  
+                  return (
+                    <div
+                      key={`${day}-${slot.id}`}
+                      className="p-3 border-r border-gray-50 last:border-r-0 flex items-center"
+                      onDragOver={handleDragOver}
+                      onDrop={(e) => handleDrop(e, day, slot.id)}
+                    >
+                      {meal ? (
+                        <div className="w-full bg-green-50 border border-green-200 rounded-2xl p-4 relative group hover:shadow-sm transition-all">
+                          <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+                            <button
+                              onClick={() => handleSwapMeal(day, slot.id, meal)}
+                              className="w-6 h-6 bg-blue-500 text-white rounded-full text-xs hover:bg-blue-600 flex items-center justify-center"
+                            >
+                              <ArrowLeftRight className="w-3 h-3" />
+                            </button>
+                            <button
+                              onClick={() => removeMeal(day, slot.id)}
+                              className="w-6 h-6 bg-red-500 text-white rounded-full text-xs hover:bg-red-600 flex items-center justify-center"
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+                          </div>
+                          
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="text-lg">{meal.image}</span>
+                            <h4 className="font-medium text-gray-900 text-sm pr-12">{meal.name}</h4>
+                          </div>
+                          <div className="text-xs text-gray-600 space-y-1">
+                            <div className="flex items-center gap-1">
+                              <Flame className="w-3 h-3 text-orange-500" />
+                              <span className="font-medium">{meal.calories} cal</span>
+                            </div>
+                            <div className="text-gray-500">
+                              {meal.protein}p • {meal.carbs}c • {meal.fat}f
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="w-full border-2 border-dashed border-gray-200 rounded-2xl p-4 flex items-center justify-center text-gray-400 hover:border-green-400 hover:bg-green-50 transition-colors min-h-[60px]">
+                          <div className="text-center">
+                            <Plus className="w-5 h-5 mx-auto mb-1" />
+                            <div className="text-xs">Add meal</div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
       </div>
 
       {/* Available Meals */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Available Meals</h2>
+      <div className="bg-white rounded-2xl shadow-sm p-6">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h2 className="text-xl font-bold text-gray-900">Available Meals</h2>
+            <p className="text-gray-600 text-sm mt-1">Drag these delicious meals into your weekly plan</p>
+          </div>
+          <button className="text-green-500 hover:text-green-600 text-sm font-medium">
+            View All Meals →
+          </button>
+        </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {mockMeals.map(meal => (
             <div
               key={meal.id}
               draggable
               onDragStart={(e) => handleDragStart(e, meal)}
-              className="border border-gray-200 rounded-lg p-4 cursor-move hover:border-green-400 hover:bg-green-50 transition-colors"
+              className="border border-gray-200 rounded-2xl p-4 cursor-move hover:border-green-400 hover:bg-green-50 transition-all hover:shadow-sm"
             >
-              <div className="flex items-center gap-3 mb-2">
-                <ChefHat className="w-5 h-5 text-green-600" />
-                <h3 className="font-medium text-gray-900">{meal.name}</h3>
+              <div className="flex items-center gap-3 mb-3">
+                <span className="text-2xl">{meal.image}</span>
+                <div className="flex-1">
+                  <h3 className="font-medium text-gray-900 text-sm">{meal.name}</h3>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      meal.difficulty === 'Easy' ? 'bg-green-100 text-green-700' :
+                      meal.difficulty === 'Medium' ? 'bg-yellow-100 text-yellow-700' :
+                      'bg-red-100 text-red-700'
+                    }`}>
+                      {meal.difficulty}
+                    </span>
+                  </div>
+                </div>
               </div>
               
-              <div className="text-sm text-gray-600 space-y-1">
-                <div className="flex items-center justify-between">
-                  <span>Calories: {meal.calories}</span>
-                  <span className={`px-2 py-1 rounded text-xs ${
-                    meal.difficulty === 'Easy' ? 'bg-green-100 text-green-700' :
-                    meal.difficulty === 'Medium' ? 'bg-yellow-100 text-yellow-700' :
-                    'bg-red-100 text-red-700'
-                  }`}>
-                    {meal.difficulty}
-                  </span>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-sm">
+                  <div className="flex items-center gap-1">
+                    <Flame className="w-3 h-3 text-orange-500" />
+                    <span className="font-medium">{meal.calories} cal</span>
+                  </div>
+                  <div className="flex items-center gap-1 text-gray-500">
+                    <Clock className="w-3 h-3" />
+                    <span>{meal.cookTime}min</span>
+                  </div>
                 </div>
-                <div>Protein: {meal.protein}g • Carbs: {meal.carbs}g • Fat: {meal.fat}g</div>
-                <div className="flex items-center gap-1 text-gray-500">
-                  <Clock className="w-3 h-3" />
-                  {meal.cookTime} minutes
+                <div className="text-xs text-gray-500">
+                  {meal.protein}g protein • {meal.carbs}g carbs • {meal.fat}g fat
                 </div>
               </div>
             </div>
@@ -332,17 +413,20 @@ export default function MealPlanPage() {
 
       {/* Swap Modal */}
       {showSwapModal && selectedMeal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-6 max-w-3xl w-full max-h-[80vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-semibold text-gray-900">
-                Swap {selectedMeal.currentMeal?.name}
-              </h3>
+              <div>
+                <h3 className="text-xl font-bold text-gray-900">
+                  Swap {selectedMeal.currentMeal?.name}
+                </h3>
+                <p className="text-gray-600 text-sm mt-1">Choose a replacement meal</p>
+              </div>
               <button
                 onClick={() => setShowSwapModal(false)}
-                className="text-gray-400 hover:text-gray-600"
+                className="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors"
               >
-                <X className="w-6 h-6" />
+                <X className="w-5 h-5" />
               </button>
             </div>
             
@@ -353,14 +437,26 @@ export default function MealPlanPage() {
                 <button
                   key={meal.id}
                   onClick={() => swapMeal(meal)}
-                  className="border border-gray-200 rounded-lg p-4 text-left hover:border-green-400 hover:bg-green-50 transition-colors"
+                  className="border border-gray-200 rounded-2xl p-4 text-left hover:border-green-400 hover:bg-green-50 transition-all"
                 >
-                  <h4 className="font-medium text-gray-900 mb-2">{meal.name}</h4>
+                  <div className="flex items-center gap-3 mb-3">
+                    <span className="text-2xl">{meal.image}</span>
+                    <h4 className="font-medium text-gray-900">{meal.name}</h4>
+                  </div>
                   <div className="text-sm text-gray-600 space-y-1">
-                    <div>Calories: {meal.calories} • Protein: {meal.protein}g</div>
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center justify-between">
+                      <span>{meal.calories} calories • {meal.protein}g protein</span>
+                      <span className={`px-2 py-1 rounded-full text-xs ${
+                        meal.difficulty === 'Easy' ? 'bg-green-100 text-green-700' :
+                        meal.difficulty === 'Medium' ? 'bg-yellow-100 text-yellow-700' :
+                        'bg-red-100 text-red-700'
+                      }`}>
+                        {meal.difficulty}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1 text-gray-500">
                       <Clock className="w-3 h-3" />
-                      {meal.cookTime} minutes • {meal.difficulty}
+                      {meal.cookTime} minutes
                     </div>
                   </div>
                 </button>
