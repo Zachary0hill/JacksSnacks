@@ -1,7 +1,3 @@
-import { auth } from '@clerk/nextjs/server'
-import { redirect } from 'next/navigation'
-import { UserButton } from '@clerk/nextjs'
-import { createServerSupabaseClient } from '@/lib/supabase'
 import {
   Home,
   Calendar,
@@ -11,7 +7,8 @@ import {
   Settings,
   Search,
   Bell,
-  Plus
+  Plus,
+  User
 } from 'lucide-react'
 import Link from 'next/link'
 
@@ -24,29 +21,11 @@ const navigation = [
   { name: 'Settings', href: '/dashboard/settings', icon: Settings },
 ]
 
-export default async function DashboardLayout({
+export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const { userId } = auth()
-  
-  if (!userId) {
-    redirect('/')
-  }
-
-  // Check if user has completed onboarding
-  const supabase = createServerSupabaseClient()
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('onboarding_completed, full_name')
-    .eq('id', userId)
-    .single()
-
-  if (!profile?.onboarding_completed) {
-    redirect('/onboarding')
-  }
-
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Top Bar */}
@@ -76,13 +55,9 @@ export default async function DashboardLayout({
               <button className="p-2 text-gray-600 hover:text-green-600 transition-colors">
                 <Bell className="h-6 w-6" />
               </button>
-              <UserButton 
-                appearance={{
-                  elements: {
-                    avatarBox: "h-8 w-8"
-                  }
-                }}
-              />
+              <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                <User className="h-5 w-5 text-green-600" />
+              </div>
             </div>
           </div>
         </div>

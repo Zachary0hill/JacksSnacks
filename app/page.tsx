@@ -1,8 +1,6 @@
 import { redirect } from 'next/navigation'
-import { auth } from '@clerk/nextjs/server'
-import { createServerSupabaseClient } from '@/lib/supabase'
-import { SignInButton, SignUpButton } from '@clerk/nextjs'
 import { ChefHat, Target, ShoppingCart, BarChart3 } from 'lucide-react'
+import Link from 'next/link'
 
 function LandingPage() {
   return (
@@ -15,16 +13,18 @@ function LandingPage() {
             <span className="text-2xl font-bold text-gray-900">Jack's Snacks</span>
           </div>
           <div className="flex items-center space-x-4">
-            <SignInButton>
-              <button className="px-4 py-2 text-gray-700 hover:text-green-600 transition-colors">
-                Sign In
-              </button>
-            </SignInButton>
-            <SignUpButton>
-              <button className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
-                Get Started
-              </button>
-            </SignUpButton>
+            <Link 
+              href="/dashboard"
+              className="px-4 py-2 text-gray-700 hover:text-green-600 transition-colors"
+            >
+              Sign In
+            </Link>
+            <Link 
+              href="/dashboard"
+              className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+            >
+              Get Started
+            </Link>
           </div>
         </div>
       </header>
@@ -40,11 +40,12 @@ function LandingPage() {
           desktop-first meal prep platform designed for serious meal planners.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <SignUpButton>
-            <button className="px-8 py-3 bg-green-600 text-white text-lg rounded-lg hover:bg-green-700 transition-colors">
-              Start Planning Free
-            </button>
-          </SignUpButton>
+          <Link 
+            href="/dashboard"
+            className="px-8 py-3 bg-green-600 text-white text-lg rounded-lg hover:bg-green-700 transition-colors"
+          >
+            Start Planning Free
+          </Link>
           <button className="px-8 py-3 border-2 border-green-600 text-green-600 text-lg rounded-lg hover:bg-green-50 transition-colors">
             View Demo
           </button>
@@ -103,11 +104,12 @@ function LandingPage() {
           <p className="text-xl mb-8 opacity-90">
             Join thousands of users who have simplified their meal prep with Jack's Snacks.
           </p>
-          <SignUpButton>
-            <button className="px-8 py-3 bg-white text-green-600 text-lg rounded-lg hover:bg-gray-100 transition-colors font-semibold">
-              Get Started Free
-            </button>
-          </SignUpButton>
+          <Link 
+            href="/dashboard"
+            className="px-8 py-3 bg-white text-green-600 text-lg rounded-lg hover:bg-gray-100 transition-colors font-semibold"
+          >
+            Get Started Free
+          </Link>
         </div>
       </section>
 
@@ -127,24 +129,7 @@ function LandingPage() {
   )
 }
 
-export default async function HomePage() {
-  const { userId } = auth()
-  
-  if (!userId) {
-    return <LandingPage />
-  }
-
-  // Check if user has completed onboarding
-  const supabase = createServerSupabaseClient()
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('onboarding_completed')
-    .eq('id', userId)
-    .single()
-
-  if (!profile?.onboarding_completed) {
-    redirect('/onboarding')
-  }
-
-  redirect('/dashboard')
+export default function HomePage() {
+  // For now, just show the landing page without auth
+  return <LandingPage />
 } 

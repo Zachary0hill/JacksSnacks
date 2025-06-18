@@ -1,5 +1,3 @@
-import { auth } from '@clerk/nextjs/server'
-import { createServerSupabaseClient } from '@/lib/supabase'
 import { CalendarDays, Target, Utensils, ShoppingCart, TrendingUp, Clock } from 'lucide-react'
 import Link from 'next/link'
 
@@ -39,6 +37,15 @@ const mockTodaysMeals = [
     prepared: false
   }
 ]
+
+// Mock profile data
+const mockProfile = {
+  full_name: 'John Doe',
+  target_calories: 2000,
+  target_protein: 150,
+  target_carbs: 200,
+  target_fat: 70
+}
 
 function MacroRing({ current, target, label, color }: { 
   current: number
@@ -89,20 +96,8 @@ function MacroRing({ current, target, label, color }: {
   )
 }
 
-export default async function DashboardPage() {
-  const { userId } = auth()
-  
-  // Get user profile
-  const supabase = createServerSupabaseClient()
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', userId)
-    .single()
-
-  if (!profile) {
-    return <div>Profile not found</div>
-  }
+export default function DashboardPage() {
+  const profile = mockProfile
 
   // Calculate today's totals from mock data
   const todayTotals = mockTodaysMeals.reduce((acc, meal) => ({
