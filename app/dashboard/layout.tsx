@@ -8,17 +8,19 @@ import {
   Search,
   Bell,
   Plus,
-  User
+  User,
+  Truck,
+  Package
 } from 'lucide-react'
 import Link from 'next/link'
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: Home },
-  { name: 'Planner', href: '/dashboard/planner', icon: Calendar },
-  { name: 'Recipes', href: '/dashboard/recipes', icon: ChefHat },
-  { name: 'Subscription', href: '/dashboard/subscription', icon: ShoppingCart },
-  { name: 'Analytics', href: '/dashboard/analytics', icon: BarChart3 },
-  { name: 'Settings', href: '/dashboard/settings', icon: Settings },
+  { name: 'My Meal Plan', href: '/dashboard/meal-plan', icon: Calendar },
+  { name: 'Deliveries', href: '/dashboard/deliveries', icon: Truck },
+  { name: 'Nutrition Tracker', href: '/dashboard/nutrition', icon: BarChart3 },
+  { name: 'Tools & Add-ons', href: '/dashboard/tools', icon: Package },
+  { name: 'Account/Billing', href: '/dashboard/account', icon: Settings },
 ]
 
 export default function DashboardLayout({

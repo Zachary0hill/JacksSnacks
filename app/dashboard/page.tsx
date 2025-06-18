@@ -1,223 +1,160 @@
-import { CalendarDays, Target, Utensils, ShoppingCart, TrendingUp, Clock } from 'lucide-react'
-import Link from 'next/link'
+'use client'
 
-// Mock data - will be replaced with real data from Supabase
-const mockTodaysMeals = [
-  {
-    id: '1',
-    type: 'breakfast',
-    recipe: 'Overnight Oats with Berries',
-    time: '8:00 AM',
-    calories: 350,
-    protein: 12,
-    carbs: 65,
-    fat: 8,
-    prepared: true
-  },
-  {
-    id: '2', 
-    type: 'lunch',
-    recipe: 'Grilled Chicken Salad',
-    time: '12:30 PM',
-    calories: 420,
-    protein: 35,
-    carbs: 15,
-    fat: 22,
-    prepared: false
-  },
-  {
-    id: '3',
-    type: 'dinner', 
-    recipe: 'Salmon with Quinoa',
-    time: '7:00 PM',
-    calories: 580,
-    protein: 40,
-    carbs: 45,
-    fat: 28,
-    prepared: false
-  }
-]
-
-// Mock profile data
-const mockProfile = {
-  full_name: 'John Doe',
-  target_calories: 2000,
-  target_protein: 150,
-  target_carbs: 200,
-  target_fat: 70
-}
-
-function MacroRing({ current, target, label, color }: { 
-  current: number
-  target: number
-  label: string
-  color: string 
-}) {
-  const percentage = Math.min((current / target) * 100, 100)
-  const circumference = 2 * Math.PI * 40
-  const strokeDasharray = circumference
-  const strokeDashoffset = circumference - (percentage / 100) * circumference
-
-  return (
-    <div className="flex flex-col items-center">
-      <div className="relative w-24 h-24">
-        <svg className="transform -rotate-90 w-24 h-24">
-          <circle
-            cx="48"
-            cy="48"
-            r="40"
-            stroke="currentColor"
-            strokeWidth="8"
-            fill="transparent"
-            className="text-gray-200"
-          />
-          <circle
-            cx="48"
-            cy="48"
-            r="40"
-            stroke="currentColor"
-            strokeWidth="8"
-            fill="transparent"
-            strokeDasharray={strokeDasharray}
-            strokeDashoffset={strokeDashoffset}
-            className={color}
-            style={{ transition: 'stroke-dashoffset 0.5s ease-in-out' }}
-          />
-        </svg>
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-center">
-            <div className="text-lg font-bold">{current}</div>
-            <div className="text-xs text-gray-500">/{target}</div>
-          </div>
-        </div>
-      </div>
-      <div className="mt-2 text-sm font-medium text-gray-700">{label}</div>
-    </div>
-  )
-}
+import { 
+  Calendar, 
+  TrendingUp, 
+  Truck, 
+  Clock, 
+  Target,
+  Zap,
+  Award,
+  ChevronRight,
+  Apple,
+  Flame,
+  Activity
+} from 'lucide-react'
 
 export default function DashboardPage() {
-  const profile = mockProfile
+  // Mock data - would come from Supabase in real app
+  const mockProfile = {
+    name: 'Alex Johnson',
+    height: { feet: 5, inches: 8 },
+    weight: 165,
+    goal: 'maintain',
+    activityLevel: 'moderate',
+    mealsPerDay: 3,
+    targetCalories: 2200,
+    targetProtein: 150,
+    targetCarbs: 275,
+    targetFat: 73
+  }
 
-  // Calculate today's totals from mock data
-  const todayTotals = mockTodaysMeals.reduce((acc, meal) => ({
-    calories: acc.calories + meal.calories,
-    protein: acc.protein + meal.protein,
-    carbs: acc.carbs + meal.carbs,
-    fat: acc.fat + meal.fat
-  }), { calories: 0, protein: 0, carbs: 0, fat: 0 })
+  const mockWeekMeals = [
+    { day: 'Mon', meals: ['Chicken Teriyaki Bowl', 'Greek Salad', 'Beef Stir Fry'], calories: 2180 },
+    { day: 'Tue', meals: ['Salmon Quinoa', 'Turkey Wrap', 'Pasta Primavera'], calories: 2240 },
+    { day: 'Wed', meals: ['Veggie Buddha Bowl', 'Chicken Caesar', 'Pork Tenderloin'], calories: 2190 },
+    { day: 'Thu', meals: ['Breakfast Burrito', 'Tuna Poke', 'Lamb Curry'], calories: 2260 },
+    { day: 'Fri', meals: ['Protein Pancakes', 'Chicken Tikka', 'Beef Tacos'], calories: 2200 },
+    { day: 'Sat', meals: ['Avocado Toast', 'Shrimp Salad', 'Steak Dinner'], calories: 2220 },
+    { day: 'Sun', meals: ['Egg Benedict', 'Fish & Chips', 'Chicken Parmesan'], calories: 2300 }
+  ]
 
-  const currentStreak = 7 // Mock streak data
-  const completedMeals = mockTodaysMeals.filter(meal => meal.prepared).length
+  const mockMacros = {
+    calories: { current: 1650, target: 2200, percentage: 75 },
+    protein: { current: 125, target: 150, percentage: 83 },
+    carbs: { current: 180, target: 275, percentage: 65 },
+    fat: { current: 58, target: 73, percentage: 79 }
+  }
 
-  return (
-    <div className="space-y-8">
-      {/* Welcome Header */}
-      <div className="bg-gradient-to-r from-green-600 to-blue-600 rounded-2xl p-8 text-white">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">
-              Good morning, {profile.full_name?.split(' ')[0] || 'there'}! 👋
-            </h1>
-            <p className="text-lg opacity-90">
-              You're on a {currentStreak}-day meal prep streak. Keep it up!
-            </p>
-          </div>
-          <div className="text-right">
-            <div className="text-sm opacity-75">Today's Progress</div>
-            <div className="text-2xl font-bold">{completedMeals}/3 meals</div>
-          </div>
+  const mockDelivery = {
+    date: 'Tomorrow, Dec 19',
+    time: '8:00 AM - 12:00 PM',
+    meals: 12,
+    courier: 'FreshDirect',
+    tracking: 'FD123456789'
+  }
+
+  const MacroRing = ({ macro, size = 120 }: { macro: any, size?: number }) => {
+    const radius = (size - 20) / 2
+    const circumference = 2 * Math.PI * radius
+    const strokeDasharray = circumference
+    const strokeDashoffset = circumference - (macro.percentage / 100) * circumference
+
+    return (
+      <div className="relative" style={{ width: size, height: size }}>
+        <svg width={size} height={size} className="transform -rotate-90">
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            stroke="#e5e7eb"
+            strokeWidth="8"
+            fill="none"
+          />
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            stroke="#10b981"
+            strokeWidth="8"
+            fill="none"
+            strokeDasharray={strokeDasharray}
+            strokeDashoffset={strokeDashoffset}
+            strokeLinecap="round"
+            className="transition-all duration-300"
+          />
+        </svg>
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+          <span className="text-2xl font-bold text-gray-900">{macro.current}</span>
+          <span className="text-xs text-gray-500">of {macro.target}</span>
         </div>
       </div>
+    )
+  }
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Weekly Plans</p>
-              <p className="text-2xl font-bold text-gray-900">3</p>
-            </div>
-            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-              <CalendarDays className="h-6 w-6 text-green-600" />
-            </div>
-          </div>
-          <p className="text-xs text-gray-500 mt-2">+2 from last week</p>
+  return (
+    <div className="max-w-7xl mx-auto space-y-8">
+      {/* Welcome Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">
+            Good morning, {mockProfile.name.split(' ')[0]}! 👋
+          </h1>
+          <p className="text-gray-600 mt-1">
+            Here's your nutrition dashboard for today
+          </p>
         </div>
-
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Recipes Saved</p>
-              <p className="text-2xl font-bold text-gray-900">24</p>
-            </div>
-            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-              <Utensils className="h-6 w-6 text-blue-600" />
-            </div>
+        <div className="flex items-center gap-3">
+          <div className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
+            7-day streak! 🔥
           </div>
-          <p className="text-xs text-gray-500 mt-2">+5 this week</p>
-        </div>
-
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Grocery Saved</p>
-              <p className="text-2xl font-bold text-gray-900">$127</p>
-            </div>
-            <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-              <ShoppingCart className="h-6 w-6 text-purple-600" />
-            </div>
-          </div>
-          <p className="text-xs text-gray-500 mt-2">vs dining out</p>
-        </div>
-
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Streak</p>
-              <p className="text-2xl font-bold text-gray-900">{currentStreak} days</p>
-            </div>
-            <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-              <TrendingUp className="h-6 w-6 text-orange-600" />
-            </div>
-          </div>
-          <p className="text-xs text-gray-500 mt-2">Personal best!</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Today's Meals */}
+        {/* Week at a Glance */}
         <div className="lg:col-span-2">
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-gray-900">Today's Meals</h2>
-              <Link 
-                href="/dashboard/planner"
-                className="text-sm text-green-600 hover:text-green-700 font-medium"
-              >
-                View Planner →
-              </Link>
+              <h2 className="text-xl font-semibold text-gray-900">Week at a Glance</h2>
+              <button className="text-green-600 hover:text-green-700 text-sm font-medium flex items-center gap-1">
+                View Full Plan <ChevronRight className="w-4 h-4" />
+              </button>
             </div>
             
             <div className="space-y-4">
-              {mockTodaysMeals.map((meal) => (
-                <div key={meal.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                  <div className="flex items-center space-x-4">
-                    <div className={`w-3 h-3 rounded-full ${meal.prepared ? 'bg-green-500' : 'bg-gray-300'}`} />
-                    <div>
-                      <h3 className="font-medium text-gray-900">{meal.recipe}</h3>
-                      <div className="flex items-center space-x-2 text-sm text-gray-500">
-                        <Clock className="h-4 w-4" />
-                        <span>{meal.time}</span>
-                        <span>•</span>
-                        <span className="capitalize">{meal.type}</span>
+              {mockWeekMeals.map((day, index) => (
+                <div key={day.day} className={`flex items-center justify-between p-4 rounded-lg border ${
+                  index === 0 ? 'border-green-200 bg-green-50' : 'border-gray-100'
+                }`}>
+                  <div className="flex items-center gap-4">
+                    <div className="text-center">
+                      <div className={`text-sm font-medium ${
+                        index === 0 ? 'text-green-700' : 'text-gray-600'
+                      }`}>
+                        {day.day}
+                      </div>
+                      {index === 0 && (
+                        <div className="text-xs text-green-600 font-medium">Today</div>
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex flex-wrap gap-2 mb-1">
+                        {day.meals.map((meal, mealIndex) => (
+                          <span
+                            key={mealIndex}
+                            className="bg-white border border-gray-200 text-gray-700 px-2 py-1 rounded text-xs"
+                          >
+                            {meal}
+                          </span>
+                        ))}
                       </div>
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="text-sm font-medium text-gray-900">{meal.calories} cal</div>
+                    <div className="text-sm font-medium text-gray-900">{day.calories} cal</div>
                     <div className="text-xs text-gray-500">
-                      P: {meal.protein}g • C: {meal.carbs}g • F: {meal.fat}g
+                      {Math.round((day.calories / mockProfile.targetCalories) * 100)}% of target
                     </div>
                   </div>
                 </div>
@@ -226,80 +163,111 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Macro Tracking */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-gray-900">Today's Macros</h2>
-            <Target className="h-5 w-5 text-gray-400" />
-          </div>
-          
-          <div className="space-y-6">
-            <MacroRing
-              current={todayTotals.calories}
-              target={profile.target_calories || 2000}
-              label="Calories"
-              color="text-green-500"
-            />
-            
-            <div className="grid grid-cols-3 gap-4">
-              <MacroRing
-                current={todayTotals.protein}
-                target={profile.target_protein || 150}
-                label="Protein"
-                color="text-blue-500"
-              />
-              <MacroRing
-                current={todayTotals.carbs}
-                target={profile.target_carbs || 200}
-                label="Carbs"
-                color="text-purple-500"
-              />
-              <MacroRing
-                current={todayTotals.fat}
-                target={profile.target_fat || 70}
-                label="Fat"
-                color="text-orange-500"
-              />
+        {/* Sidebar */}
+        <div className="space-y-6">
+          {/* Next Delivery Banner */}
+          <div className="bg-gradient-to-r from-blue-500 to-green-500 rounded-xl p-6 text-white">
+            <div className="flex items-center gap-3 mb-4">
+              <Truck className="w-6 h-6" />
+              <h3 className="font-semibold">Next Delivery</h3>
+            </div>
+            <div className="space-y-2">
+              <p className="text-sm opacity-90">{mockDelivery.date}</p>
+              <p className="font-medium">{mockDelivery.time}</p>
+              <p className="text-sm opacity-90">{mockDelivery.meals} meals • {mockDelivery.courier}</p>
+            </div>
+            <div className="flex gap-2 mt-4">
+              <button className="bg-white/20 hover:bg-white/30 px-3 py-1 rounded text-sm font-medium transition-colors">
+                Track Order
+              </button>
+              <button className="bg-white/20 hover:bg-white/30 px-3 py-1 rounded text-sm font-medium transition-colors">
+                Reschedule
+              </button>
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* Quick Actions */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Link 
-            href="/dashboard/planner"
-            className="flex items-center space-x-3 p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors"
-          >
-            <CalendarDays className="h-6 w-6 text-green-600" />
-            <span className="font-medium text-green-700">Plan This Week</span>
-          </Link>
-          
-          <Link 
-            href="/dashboard/recipes"
-            className="flex items-center space-x-3 p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
-          >
-            <Utensils className="h-6 w-6 text-blue-600" />
-            <span className="font-medium text-blue-700">Browse Recipes</span>
-          </Link>
-          
-          <Link 
-            href="/dashboard/grocery"
-            className="flex items-center space-x-3 p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors"
-          >
-            <ShoppingCart className="h-6 w-6 text-purple-600" />
-            <span className="font-medium text-purple-700">Grocery List</span>
-          </Link>
-          
-          <Link 
-            href="/dashboard/analytics"
-            className="flex items-center space-x-3 p-4 bg-orange-50 rounded-lg hover:bg-orange-100 transition-colors"
-          >
-            <TrendingUp className="h-6 w-6 text-orange-600" />
-            <span className="font-medium text-orange-700">View Analytics</span>
-          </Link>
+          {/* Macro Progress */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <h3 className="font-semibold text-gray-900 mb-4">Today's Macros</h3>
+            
+            <div className="grid grid-cols-2 gap-4 mb-6">
+              <div className="text-center">
+                <MacroRing macro={mockMacros.calories} size={100} />
+                <div className="mt-2">
+                  <div className="text-sm font-medium text-gray-900">Calories</div>
+                  <div className="text-xs text-gray-500">{mockMacros.calories.percentage}% complete</div>
+                </div>
+              </div>
+              <div className="text-center">
+                <MacroRing macro={mockMacros.protein} size={100} />
+                <div className="mt-2">
+                  <div className="text-sm font-medium text-gray-900">Protein</div>
+                  <div className="text-xs text-gray-500">{mockMacros.protein.percentage}% complete</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-gray-600">Carbs</span>
+                <span className="font-medium">{mockMacros.carbs.current}g / {mockMacros.carbs.target}g</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div 
+                  className="bg-green-500 h-2 rounded-full transition-all duration-300"
+                  style={{ width: `${mockMacros.carbs.percentage}%` }}
+                />
+              </div>
+              
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-gray-600">Fat</span>
+                <span className="font-medium">{mockMacros.fat.current}g / {mockMacros.fat.target}g</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div 
+                  className="bg-green-500 h-2 rounded-full transition-all duration-300"
+                  style={{ width: `${mockMacros.fat.percentage}%` }}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Stats */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <h3 className="font-semibold text-gray-900 mb-4">This Week</h3>
+            
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                    <Target className="w-4 h-4 text-green-600" />
+                  </div>
+                  <span className="text-sm text-gray-700">Macro adherence</span>
+                </div>
+                <span className="font-medium text-green-600">94%</span>
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                    <Activity className="w-4 h-4 text-blue-600" />
+                  </div>
+                  <span className="text-sm text-gray-700">Weight trend</span>
+                </div>
+                <span className="font-medium text-gray-900">-0.8 lbs</span>
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
+                    <Zap className="w-4 h-4 text-orange-600" />
+                  </div>
+                  <span className="text-sm text-gray-700">Streak</span>
+                </div>
+                <span className="font-medium text-orange-600">7 days</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
