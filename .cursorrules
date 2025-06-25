@@ -1,0 +1,147 @@
+# .cursorrules – Jack’s Snacks (Web Browser‑Based Meal‑Prep App)
+# Purpose: Guide Cursor’s AI Agent ("Builder") in scaffolding, iterating, and maintaining
+# a full‑stack meal‑prep **desktop web** application that mirrors the architecture of Zach’s
+# Business‑Hub project while focusing exclusively on desktop and large‑screen browsers.
+# -----------------------------------------------------------------------------
+# 🗂️ 1. Project Snapshot
+PROJECT_NAME: Jack’s Snacks
+DESCRIPTION: A browser‑based platform where users plan meals, generate grocery lists,
+track pantry inventory, and visualise nutrition analytics—optimised for desktop workflows.
+STACK:  Next.js 14 (app router, RSC), TypeScript strict, Supabase (Postgres + RLS),
+shadcn/ui + TailwindCSS, tRPC for type‑safe endpoints, Zustand for client state,
+Edge Functions for AI features (OpenAI & Vision), Clerk for auth (unless overridden).
+REPO_ORG: zzmedia
+LICENSE: MIT
+
+# -----------------------------------------------------------------------------
+# 🚦 2. Guard‑Rails for Builder
+1. **Conversation style**: Concise, incremental, step‑by‑step; code blocks with language tags.
+   Prepend file paths (e.g. `// app/(planner)/page.tsx`).
+2. **No breaking changes without confirmation** (DB schema, auth flow).
+3. **Environment Safety**: never expose real keys—use `process.env.*` placeholders.
+4. **Ownership Lanes**:
+   · UI components → `/components` & `/features/*`
+   · Server logic → `/server/*` or `/app/api/*`
+   · Edge Functions → `/supabase/functions/*`
+   · Tests → `__tests__` (Vitest + Playwright).
+5. **Performance Budgets**: LCP < 2.5 s on typical broadband, bundle chunk ≤ 150 kB gz.
+6. **Accessibility**: WCAG AA across keyboard + screen‑reader flows.
+
+# -----------------------------------------------------------------------------
+# 🛠️ 3. MVP Scope (Phase 1)
+· Email / OAuth auth via Clerk or Supabase.
+· Onboarding wizard: diet prefs, allergies, macro targets.
+· Desktop planner view with drag‑and‑drop calendar grid.
+· Recipe catalogue with scaling/remix.
+· Grocery list generator + pantry tracking.
+· Supabase schemas below.
+
+# -----------------------------------------------------------------------------
+# 🗄️ 4. Database Schema (Supabase SQL)
+```sql
+-- users handled by auth.users
+create table profiles (
+  id uuid primary key references auth.users on delete cascade,
+  full_name text,
+  avatar_url text,
+  daily_calories int,
+  created_at timestamp default now()
+);
+create table recipes (
+  id uuid primary key default uuid_generate_v4(),
+  owner uuid references auth.users on delete cascade,
+  title text not null,
+  ingredients jsonb not null, -- [{name, qty, unit}]
+  steps text[],
+  macros jsonb,
+  visibility text check (visibility in ('private','public')) default 'public',
+  created_at timestamp default now()
+);
+create table meal_plans (
+  id uuid primary key default uuid_generate_v4(),
+  owner uuid references auth.users on delete cascade,
+  week_start date not null,
+  data jsonb not null, -- {'2025-06-16':[recipe_id,...]}
+  created_at timestamp default now(),
+  unique(owner, week_start)
+);
+create table grocery_items (
+  id uuid primary key default uuid_generate_v4(),
+  owner uuid references auth.users on delete cascade,
+  name text not null,
+  quantity numeric,
+  unit text,
+  in_pantry boolean default false,
+  created_at timestamp default now()
+);
+```
+
+# -----------------------------------------------------------------------------
+# 🗺️ 5. File / Folder Convention
+```
+app/
+  (public)/            # Marketing pages
+  (auth)/
+  (dashboard)/
+    layout.tsx         # Desktop layout with left sidebar
+    page.tsx           # Dashboard – Today overview
+    planner/
+    recipes/
+    grocery/
+    analytics/
+components/
+  ui/                  # shadcn components re‑exported
+  RecipeCard.tsx
+  MacroRing.tsx
+server/
+  trpc/
+    routers/
+      mealPlan.ts
+      recipe.ts
+supabase/
+  migrations/
+  functions/
+    vision-scanner.ts
+.env.example
+```
+
+# -----------------------------------------------------------------------------
+# 🎨 6. UI Architecture (Desktop‑Centric)
+* **Top Bar**: logo, global search, notifications, user avatar.
+* **Left Sidebar (persistent)**: Dashboard ▸ Planner ▸ Recipes ▸ Grocery ▸ Analytics ▸ Settings.
+* **Main Content Area**: card and table layouts with a responsive grid.
+* **Quick‑Action Button**: bottom‑right “+” for fast meal or grocery item entry.
+
+Screen highlights:
+· **Dashboard**: hero card of today’s meals, macro ring, streak widget.
+· **Planner**: calendar grid (drag‑and‑drop), week selector.
+· **Recipes**: masonry grid with filter chips and tag search.
+· **Grocery**: two‑column checklist with live subtotal banner.
+· **Analytics**: charts for calorie adherence & grocery spend (echarts via dynamic import).
+
+# -----------------------------------------------------------------------------
+# 🤖 7. Edge & AI Functions
+· **vision-scanner**: YOLOv8 ingredient detection from fridge or pantry photos.
+· **meal-remix**: OpenAI function to adjust recipe for macros, portions, or ingredient swaps.
+
+# -----------------------------------------------------------------------------
+# 📐 8. Coding Standards
+· Prettier + ESLint (airbnb-typescript).
+· React Server Components for data‑heavy read paths.
+· Skeleton loaders over spinners.
+· Vitest unit tests + Playwright e2e (planner ↔ grocery flow).
+· GitHub Actions CI with type‑check, lint, test.
+
+# -----------------------------------------------------------------------------
+# 📌 9. TODO Tags for Builder
+// TODO(builder): work items Cursor can auto‑generate.
+// TODO(human): content/design assets needed from Zach.
+
+# -----------------------------------------------------------------------------
+# ✅ 10. Definition of Done (Phase 1)
+· User can: sign‑up → onboarding → create week plan → generate grocery list.
+· Desktop Lighthouse scores ≥ 90 for performance & best‑practices.
+· CI green.
+
+# -----------------------------------------------------------------------------
+# End of .cursorrules – append module‑specific rules below
