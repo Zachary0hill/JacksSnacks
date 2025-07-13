@@ -1,306 +1,411 @@
-import { CalendarDays, Target, Utensils, ShoppingCart, TrendingUp, Clock } from 'lucide-react'
-import Link from 'next/link'
+'use client'
 
-// Mock data - will be replaced with real data from Supabase
-const mockTodaysMeals = [
-  {
-    id: '1',
-    type: 'breakfast',
-    recipe: 'Overnight Oats with Berries',
-    time: '8:00 AM',
-    calories: 350,
-    protein: 12,
-    carbs: 65,
-    fat: 8,
-    prepared: true
-  },
-  {
-    id: '2', 
-    type: 'lunch',
-    recipe: 'Grilled Chicken Salad',
-    time: '12:30 PM',
-    calories: 420,
-    protein: 35,
-    carbs: 15,
-    fat: 22,
-    prepared: false
-  },
-  {
-    id: '3',
-    type: 'dinner', 
-    recipe: 'Salmon with Quinoa',
-    time: '7:00 PM',
-    calories: 580,
-    protein: 40,
-    carbs: 45,
-    fat: 28,
-    prepared: false
-  }
-]
-
-// Mock profile data
-const mockProfile = {
-  full_name: 'John Doe',
-  target_calories: 2000,
-  target_protein: 150,
-  target_carbs: 200,
-  target_fat: 70
-}
-
-function MacroRing({ current, target, label, color }: { 
-  current: number
-  target: number
-  label: string
-  color: string 
-}) {
-  const percentage = Math.min((current / target) * 100, 100)
-  const circumference = 2 * Math.PI * 40
-  const strokeDasharray = circumference
-  const strokeDashoffset = circumference - (percentage / 100) * circumference
-
-  return (
-    <div className="flex flex-col items-center">
-      <div className="relative w-24 h-24">
-        <svg className="transform -rotate-90 w-24 h-24">
-          <circle
-            cx="48"
-            cy="48"
-            r="40"
-            stroke="currentColor"
-            strokeWidth="8"
-            fill="transparent"
-            className="text-gray-200"
-          />
-          <circle
-            cx="48"
-            cy="48"
-            r="40"
-            stroke="currentColor"
-            strokeWidth="8"
-            fill="transparent"
-            strokeDasharray={strokeDasharray}
-            strokeDashoffset={strokeDashoffset}
-            className={color}
-            style={{ transition: 'stroke-dashoffset 0.5s ease-in-out' }}
-          />
-        </svg>
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-center">
-            <div className="text-lg font-bold">{current}</div>
-            <div className="text-xs text-gray-500">/{target}</div>
-          </div>
-        </div>
-      </div>
-      <div className="mt-2 text-sm font-medium text-gray-700">{label}</div>
-    </div>
-  )
-}
+import { 
+  Calendar, 
+  TrendingUp, 
+  Truck, 
+  Clock, 
+  Target,
+  Zap,
+  Award,
+  ChevronRight,
+  Apple,
+  Flame,
+  Activity,
+  Heart,
+  Star,
+  ChevronLeft,
+  Sparkles,
+  ChefHat,
+  Plus,
+  ArrowRight
+} from 'lucide-react'
+import { useState } from 'react'
 
 export default function DashboardPage() {
-  const profile = mockProfile
+  const [currentMealIndex, setCurrentMealIndex] = useState(0)
+  
+  // Demo data for immediate functionality (will be replaced with real data once auth is set up)
+  const profile = {
+    full_name: 'Demo User',
+    target_calories: 2200,
+    target_protein: 150,
+    target_carbs: 275,
+    target_fat: 73,
+  }
 
-  // Calculate today's totals from mock data
-  const todayTotals = mockTodaysMeals.reduce((acc, meal) => ({
-    calories: acc.calories + meal.calories,
-    protein: acc.protein + meal.protein,
-    carbs: acc.carbs + meal.carbs,
-    fat: acc.fat + meal.fat
-  }), { calories: 0, protein: 0, carbs: 0, fat: 0 })
+  const dashboardStats = {
+    currentStreak: 7,
+    longestStreak: 12,
+    totalMealsLogged: 84,
+    macrosHitThisWeek: 5,
+  }
 
-  const currentStreak = 7 // Mock streak data
-  const completedMeals = mockTodaysMeals.filter(meal => meal.prepared).length
+  const todayNutrition = {
+    calories: 1650,
+    protein: 125,
+    carbs: 180,
+    fat: 58,
+  }
+
+  const weekNutrition = [
+    { day: 'Sun', date: '2024-01-07', calories: 0, protein: 0, carbs: 0, fat: 0, completed: false },
+    { day: 'Mon', date: '2024-01-08', calories: 2180, protein: 145, carbs: 270, fat: 68, completed: true },
+    { day: 'Tue', date: '2024-01-09', calories: 2240, protein: 155, carbs: 280, fat: 71, completed: true },
+    { day: 'Wed', date: '2024-01-10', calories: 1650, protein: 125, carbs: 180, fat: 58, completed: false },
+    { day: 'Thu', date: '2024-01-11', calories: 0, protein: 0, carbs: 0, fat: 0, completed: false },
+    { day: 'Fri', date: '2024-01-12', calories: 0, protein: 0, carbs: 0, fat: 0, completed: false },
+    { day: 'Sat', date: '2024-01-13', calories: 0, protein: 0, carbs: 0, fat: 0, completed: false },
+  ]
+
+  const featuredRecipes = [
+    {
+      id: '1',
+      title: 'Honey Garlic Salmon',
+      description: 'Wild-caught salmon with roasted vegetables',
+      image_url: null,
+      macros: { calories: 520 },
+      tags: ['High Protein', 'Omega-3'],
+    },
+    {
+      id: '2', 
+      title: 'Mediterranean Chicken',
+      description: 'Herb-crusted chicken with quinoa tabbouleh',
+      image_url: null,
+      macros: { calories: 480 },
+      tags: ['Lean Protein', 'Fresh Herbs'],
+    },
+    {
+      id: '3',
+      title: 'Thai Beef Bowl', 
+      description: 'Spicy beef with jasmine rice and veggies',
+      image_url: null,
+      macros: { calories: 550 },
+      tags: ['Bold Flavors', 'Satisfying'],
+    }
+  ]
+
+  const upcomingDelivery = {
+    date: 'Friday',
+    time: '8:00 AM - 12:00 PM',
+    meals: 12,
+    courier: 'FreshDirect',
+    tracking: 'FD123456789',
+    estimatedArrival: 'this Friday'
+  }
+
+  // Calculate macro percentages based on targets
+  const macros = {
+    calories: {
+      current: todayNutrition.calories,
+      target: profile.target_calories,
+      percentage: Math.round((todayNutrition.calories / profile.target_calories) * 100)
+    },
+    protein: {
+      current: todayNutrition.protein,
+      target: profile.target_protein,
+      percentage: Math.round((todayNutrition.protein / profile.target_protein) * 100)
+    },
+    carbs: {
+      current: todayNutrition.carbs,
+      target: profile.target_carbs,
+      percentage: Math.round((todayNutrition.carbs / profile.target_carbs) * 100)
+    },
+    fat: {
+      current: todayNutrition.fat,
+      target: profile.target_fat,
+      percentage: Math.round((todayNutrition.fat / profile.target_fat) * 100)
+    }
+  }
+
+  // Use featured recipes as upcoming meals for now
+  const mealsToShow = featuredRecipes.map(recipe => ({
+    id: recipe.id,
+    name: recipe.title,
+    image: recipe.image_url || '/api/placeholder/300/200',
+    description: recipe.description,
+    calories: recipe.macros?.calories || 0,
+    tags: recipe.tags || []
+  }))
+
+  // Dynamic motivational messages based on user behavior
+  const getMotivationalMessage = () => {
+    const streak = dashboardStats.currentStreak
+    const macrosHit = dashboardStats.macrosHitThisWeek
+    
+    if (streak >= 7) {
+      return `You've hit your macros ${macrosHit} days this week—you're absolutely crushing it!`
+    } else if (macrosHit >= 3) {
+      return `${macrosHit} days of perfect nutrition this week. Your body is thanking you!`
+    } else if (streak >= 3) {
+      return `${streak} days strong! Consistency is the key to lasting change.`
+    } else {
+      return `Every healthy choice matters. You're building something amazing, one meal at a time!`
+    }
+  }
+
+  // Dynamic hero message based on time and progress
+  const getHeroMessage = () => {
+    const hour = new Date().getHours()
+    const timeOfDay = hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'evening'
+    const firstName = profile.full_name?.split(' ')[0] || 'there'
+    const streak = dashboardStats.currentStreak
+    const macrosHit = dashboardStats.macrosHitThisWeek
+    
+    if (streak >= 7) {
+      return `You're absolutely crushing your goals, ${firstName}!`
+    } else if (macrosHit >= 4) {
+      return `You're fueling your goals perfectly, ${firstName}!`
+    } else {
+      return `Good ${timeOfDay}, ${firstName}! Ready to fuel greatness?`
+    }
+  }
+
+  const MacroRing = ({ macro, size = 80 }: { macro: any, size?: number }) => {
+    const radius = (size - 16) / 2
+    const circumference = 2 * Math.PI * radius
+    const strokeDasharray = circumference
+    const strokeDashoffset = circumference - (macro.percentage / 100) * circumference
+
+    return (
+      <div className="relative" style={{ width: size, height: size }}>
+        <svg width={size} height={size} className="transform -rotate-90">
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            stroke="#f1f5f9"
+            strokeWidth="6"
+            fill="none"
+          />
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            stroke="#22c55e"
+            strokeWidth="6"
+            fill="none"
+            strokeDasharray={strokeDasharray}
+            strokeDashoffset={strokeDashoffset}
+            strokeLinecap="round"
+            className="transition-all duration-500"
+          />
+        </svg>
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+          <span className="text-lg font-bold text-gray-900">{macro.current}</span>
+          <span className="text-xs text-gray-500">of {macro.target}</span>
+        </div>
+      </div>
+    )
+  }
+
+  const nextMeal = () => {
+    setCurrentMealIndex((prev) => (prev + 1) % mealsToShow.length)
+  }
+
+  const prevMeal = () => {
+    setCurrentMealIndex((prev) => (prev - 1 + mealsToShow.length) % mealsToShow.length)
+  }
 
   return (
-    <div className="space-y-8">
-      {/* Welcome Header */}
-      <div className="bg-gradient-to-r from-green-600 to-blue-600 rounded-2xl p-8 text-white">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">
-              Good morning, {profile.full_name?.split(' ')[0] || 'there'}! 👋
+    <div className="max-w-6xl mx-auto space-y-6 p-6 bg-gray-50 min-h-screen">
+      {/* Hero Section */}
+      <div className="bg-gradient-to-r from-green-400 to-green-500 rounded-3xl p-8 text-white relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -translate-y-20 translate-x-20"></div>
+        <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/10 rounded-full translate-y-16 -translate-x-16"></div>
+        
+        <div className="relative z-10 flex items-center justify-between">
+          <div className="flex-1">
+            <h1 className="text-3xl font-bold mb-3 leading-tight">
+              {getHeroMessage()}
             </h1>
-            <p className="text-lg opacity-90">
-              You're on a {currentStreak}-day meal prep streak. Keep it up!
+            <p className="text-green-50 mb-6 text-lg font-medium">
+              {getMotivationalMessage()}
             </p>
-          </div>
-          <div className="text-right">
-            <div className="text-sm opacity-75">Today's Progress</div>
-            <div className="text-2xl font-bold">{completedMeals}/3 meals</div>
-          </div>
-        </div>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Weekly Plans</p>
-              <p className="text-2xl font-bold text-gray-900">3</p>
-            </div>
-            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-              <CalendarDays className="h-6 w-6 text-green-600" />
-            </div>
-          </div>
-          <p className="text-xs text-gray-500 mt-2">+2 from last week</p>
-        </div>
-
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Recipes Saved</p>
-              <p className="text-2xl font-bold text-gray-900">24</p>
-            </div>
-            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-              <Utensils className="h-6 w-6 text-blue-600" />
-            </div>
-          </div>
-          <p className="text-xs text-gray-500 mt-2">+5 this week</p>
-        </div>
-
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Grocery Saved</p>
-              <p className="text-2xl font-bold text-gray-900">$127</p>
-            </div>
-            <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-              <ShoppingCart className="h-6 w-6 text-purple-600" />
-            </div>
-          </div>
-          <p className="text-xs text-gray-500 mt-2">vs dining out</p>
-        </div>
-
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Streak</p>
-              <p className="text-2xl font-bold text-gray-900">{currentStreak} days</p>
-            </div>
-            <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-              <TrendingUp className="h-6 w-6 text-orange-600" />
-            </div>
-          </div>
-          <p className="text-xs text-gray-500 mt-2">Personal best!</p>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Today's Meals */}
-        <div className="lg:col-span-2">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-gray-900">Today's Meals</h2>
-              <Link 
-                href="/dashboard/planner"
-                className="text-sm text-green-600 hover:text-green-700 font-medium"
-              >
-                View Planner →
-              </Link>
-            </div>
             
-            <div className="space-y-4">
-              {mockTodaysMeals.map((meal) => (
-                <div key={meal.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                  <div className="flex items-center space-x-4">
-                    <div className={`w-3 h-3 rounded-full ${meal.prepared ? 'bg-green-500' : 'bg-gray-300'}`} />
-                    <div>
-                      <h3 className="font-medium text-gray-900">{meal.recipe}</h3>
-                      <div className="flex items-center space-x-2 text-sm text-gray-500">
-                        <Clock className="h-4 w-4" />
-                        <span>{meal.time}</span>
-                        <span>•</span>
-                        <span className="capitalize">{meal.type}</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-sm font-medium text-gray-900">{meal.calories} cal</div>
-                    <div className="text-xs text-gray-500">
-                      P: {meal.protein}g • C: {meal.carbs}g • F: {meal.fat}g
-                    </div>
-                  </div>
-                </div>
-              ))}
+            {/* Progress Stats */}
+            <div className="flex space-x-8">
+              <div className="text-center">
+                <div className="text-2xl font-bold">{dashboardStats.currentStreak}</div>
+                <div className="text-green-100 text-sm">Day Streak</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold">{dashboardStats.totalMealsLogged}</div>
+                <div className="text-green-100 text-sm">Meals Logged</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold">{dashboardStats.macrosHitThisWeek}</div>
+                <div className="text-green-100 text-sm">Perfect Days</div>
+              </div>
             </div>
-          </div>
-        </div>
-
-        {/* Macro Tracking */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-gray-900">Today's Macros</h2>
-            <Target className="h-5 w-5 text-gray-400" />
           </div>
           
-          <div className="space-y-6">
-            <MacroRing
-              current={todayTotals.calories}
-              target={profile.target_calories || 2000}
-              label="Calories"
-              color="text-green-500"
-            />
-            
-            <div className="grid grid-cols-3 gap-4">
-              <MacroRing
-                current={todayTotals.protein}
-                target={profile.target_protein || 150}
-                label="Protein"
-                color="text-blue-500"
-              />
-              <MacroRing
-                current={todayTotals.carbs}
-                target={profile.target_carbs || 200}
-                label="Carbs"
-                color="text-purple-500"
-              />
-              <MacroRing
-                current={todayTotals.fat}
-                target={profile.target_fat || 70}
-                label="Fat"
-                color="text-orange-500"
-              />
-            </div>
+          {/* Achievement Badge */}
+          <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-6 text-center">
+            <Award className="w-12 h-12 mx-auto mb-2" />
+            <div className="font-bold">Nutrition Master</div>
+            <div className="text-green-100 text-sm">Keep it up!</div>
           </div>
         </div>
       </div>
+
+      {/* Today's Macros */}
+      <div className="bg-white rounded-3xl p-8 shadow-sm">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold text-gray-900">Today's Nutrition</h2>
+          <div className="text-sm text-gray-500">
+            {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+          </div>
+        </div>
+        
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+          {Object.entries(macros).map(([key, macro]) => (
+            <div key={key} className="text-center">
+              <MacroRing macro={macro} size={100} />
+              <div className="mt-4">
+                <div className="font-bold text-gray-900 capitalize">{key}</div>
+                <div className="text-sm text-gray-500">
+                  {macro.percentage}% of target
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* This Week Overview & Upcoming Meals */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Week Overview */}
+        <div className="bg-white rounded-3xl p-6 shadow-sm">
+          <h3 className="text-xl font-bold text-gray-900 mb-4">This Week</h3>
+          <div className="space-y-3">
+            {weekNutrition.slice(0, 7).map((day: any, index: number) => (
+              <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+                <div className="flex items-center space-x-3">
+                  <div className={`w-3 h-3 rounded-full ${day.completed ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+                  <span className="font-medium text-gray-900">{day.day}</span>
+                </div>
+                <div className="text-sm text-gray-500">
+                  {day.calories > 0 ? `${day.calories} cal` : 'Not logged'}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Upcoming Meals */}
+        <div className="bg-white rounded-3xl p-6 shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-xl font-bold text-gray-900">Featured Recipes</h3>
+            <div className="flex space-x-2">
+              <button 
+                onClick={prevMeal}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <button 
+                onClick={nextMeal}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+          
+          {mealsToShow && mealsToShow.length > 0 && (
+            <div className="bg-gray-50 rounded-2xl p-4">
+              <div className="aspect-video bg-gradient-to-br from-orange-100 to-orange-200 rounded-xl mb-4 flex items-center justify-center">
+                <ChefHat className="w-12 h-12 text-orange-500" />
+              </div>
+              <h4 className="font-bold text-gray-900 mb-2">
+                {mealsToShow[currentMealIndex]?.name || 'Featured Recipe'}
+              </h4>
+              <p className="text-sm text-gray-600 mb-3">
+                {mealsToShow[currentMealIndex]?.description || 'Delicious and nutritious'}
+              </p>
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-green-600">
+                  {mealsToShow[currentMealIndex]?.calories || 0} calories
+                </span>
+                <div className="flex space-x-1">
+                  {(mealsToShow[currentMealIndex]?.tags || []).slice(0, 2).map((tag: string, i: number) => (
+                    <span key={i} className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Delivery Info */}
+      {upcomingDelivery && (
+        <div className="bg-white rounded-3xl p-6 shadow-sm">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="w-16 h-16 bg-gradient-to-r from-blue-400 to-blue-500 rounded-2xl flex items-center justify-center">
+                <Truck className="w-8 h-8 text-white" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-gray-900">Next Delivery</h3>
+                <p className="text-gray-600">
+                  {upcomingDelivery.date} • {upcomingDelivery.time}
+                </p>
+                <p className="text-sm text-gray-500">
+                  {upcomingDelivery.meals} meals via {upcomingDelivery.courier}
+                </p>
+              </div>
+            </div>
+            <div className="text-center">
+              <div className="text-sm text-gray-500 mb-1">Tracking</div>
+              <div className="font-mono text-sm bg-gray-100 px-3 py-1 rounded">
+                {upcomingDelivery.tracking}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Quick Actions */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Link 
-            href="/dashboard/planner"
-            className="flex items-center space-x-3 p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors"
-          >
-            <CalendarDays className="h-6 w-6 text-green-600" />
-            <span className="font-medium text-green-700">Plan This Week</span>
-          </Link>
-          
-          <Link 
-            href="/dashboard/recipes"
-            className="flex items-center space-x-3 p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
-          >
-            <Utensils className="h-6 w-6 text-blue-600" />
-            <span className="font-medium text-blue-700">Browse Recipes</span>
-          </Link>
-          
-          <Link 
-            href="/dashboard/grocery"
-            className="flex items-center space-x-3 p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors"
-          >
-            <ShoppingCart className="h-6 w-6 text-purple-600" />
-            <span className="font-medium text-purple-700">Grocery List</span>
-          </Link>
-          
-          <Link 
-            href="/dashboard/analytics"
-            className="flex items-center space-x-3 p-4 bg-orange-50 rounded-lg hover:bg-orange-100 transition-colors"
-          >
-            <TrendingUp className="h-6 w-6 text-orange-600" />
-            <span className="font-medium text-orange-700">View Analytics</span>
-          </Link>
-        </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <button className="bg-white rounded-2xl p-6 text-left hover:shadow-md transition-shadow">
+          <div className="flex items-center space-x-3 mb-3">
+            <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+              <Plus className="w-6 h-6 text-green-600" />
+            </div>
+            <div>
+              <div className="font-bold text-gray-900">Log Meal</div>
+              <div className="text-sm text-gray-500">Track your nutrition</div>
+            </div>
+          </div>
+        </button>
+        
+        <button className="bg-white rounded-2xl p-6 text-left hover:shadow-md transition-shadow">
+          <div className="flex items-center space-x-3 mb-3">
+            <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+              <Calendar className="w-6 h-6 text-blue-600" />
+            </div>
+            <div>
+              <div className="font-bold text-gray-900">Plan Week</div>
+              <div className="text-sm text-gray-500">Create meal plan</div>
+            </div>
+          </div>
+        </button>
+        
+        <button className="bg-white rounded-2xl p-6 text-left hover:shadow-md transition-shadow">
+          <div className="flex items-center space-x-3 mb-3">
+            <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+              <ChefHat className="w-6 h-6 text-purple-600" />
+            </div>
+            <div>
+              <div className="font-bold text-gray-900">Browse Recipes</div>
+              <div className="text-sm text-gray-500">Find new meals</div>
+            </div>
+          </div>
+        </button>
       </div>
     </div>
   )
